@@ -6,6 +6,22 @@ import streamlit as st
 from core import kaoyan_advisor, kaoyan_storage
 
 st.set_page_config(page_title="考研咨询", page_icon="📚")
+
+# ===== 冷色专业风 CSS =====
+st.markdown("""
+<style>
+    .stApp { background: #F5F7FA !important; }
+    h1 { color: #2C5282 !important; font-weight: 700; }
+    h2, h3 { color: #2A4365 !important; }
+    .stButton > button {
+        background: #2C5282; color: white; border-radius: 6px;
+    }
+    .stExpander {
+        border-left: 3px solid #2C5282; background: white;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 st.title("📚 考研咨询小助手")
 st.caption("知心猫猫帮你看院校 + 给建议 + 做计划")
 

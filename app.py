@@ -1,5 +1,5 @@
 """
-知心猫猫 —— Streamlit 主入口
+知心猫猫 —— Streamlit 主入口（温暖治愈风）
 启动：streamlit run app.py
 """
 from pathlib import Path
@@ -13,7 +13,47 @@ CAT_AVATAR = str(ASSETS / "cat_avatar.png")
 
 st.set_page_config(page_title="知心猫猫", page_icon="🐱", layout="centered")
 
-# 顶部品牌区：猫咪头像 + 标题
+# ===== 温暖治愈风 CSS =====
+st.markdown("""
+<style>
+    /* 全局背景：暖米白 */
+    .stApp {
+        background: linear-gradient(135deg, #FFF9F5 0%, #FFEFE3 100%);
+    }
+    /* 标题柔和 */
+    h1 {
+        color: #E07B4F !important;
+        font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        font-weight: 600;
+    }
+    /* 聊天气泡：圆角柔和 */
+    .stChatMessage {
+        border-radius: 18px !important;
+        padding: 12px 16px;
+        margin: 8px 0;
+        background: #FFFFFF;
+        box-shadow: 0 2px 8px rgba(224, 123, 79, 0.08);
+    }
+    /* 输入框 */
+    .stChatInputContainer {
+        border-radius: 24px !important;
+    }
+    /* 按钮：暖橙色 */
+    .stButton > button {
+        background: linear-gradient(135deg, #FFB18A, #FF8C5A);
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 8px 20px;
+    }
+    /* 侧边栏 */
+    section[data-testid="stSidebar"] {
+        background: #FFF3E8;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# 顶部品牌区
 col1, col2 = st.columns([1, 4])
 with col1:
     st.image(CAT_AVATAR, width=110)
@@ -42,13 +82,11 @@ if "messages" not in st.session_state:
         {"role": "assistant", "content": "喵~ 我是知心猫猫，蜷在你桌边的那只橘猫。今天过得怎么样？尾巴借给你撸。"}
     ]
 
-# 渲染历史（assistant用猫咪头像）
 for msg in st.session_state.messages:
     avatar = CAT_AVATAR if msg["role"] == "assistant" else None
     with st.chat_message(msg["role"], avatar=avatar):
         st.write(msg["content"])
 
-# 用户输入
 user_input = st.chat_input("和猫猫说说...")
 if user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})

@@ -6,6 +6,26 @@ import streamlit as st
 from core import cs408_advisor
 
 st.set_page_config(page_title="408专业课", page_icon="💻")
+
+# ===== 冷色专业风 CSS =====
+st.markdown("""
+<style>
+    .stApp { background: #F5F7FA !important; }
+    h1 { color: #2C5282 !important; font-weight: 700; }
+    h2, h3 { color: #2A4365 !important; }
+    .stTabs [data-baseweb="tab"] {
+        font-weight: 600; color: #4A5568;
+    }
+    .stButton > button {
+        background: #2C5282; color: white; border-radius: 6px;
+    }
+    .stExpander {
+        border-left: 3px solid #2C5282; background: white;
+        border-radius: 4px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 st.title("💻 408专业课学习助手")
 st.caption("数据结构 · 计组 · 操作系统 · 数据库")
 
