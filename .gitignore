@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 数据库（每次运行自动生成，不要上传）
+data/*.db
+
+# 本地环境
+.venv/
+venv/
+.env
+
+# Streamlit
+.streamlit/
+
+# OS
+.DS_Store
+Thumbs.db
