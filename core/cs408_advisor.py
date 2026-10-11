@@ -9,9 +9,16 @@ from pathlib import Path
 
 from openai import OpenAI
 
-from .chat_engine import client, MODEL
+from . import config
 
 DATA_DIR = Path(__file__).parent.parent / "data"
+
+
+def _get_client() -> OpenAI:
+    """惰性创建客户端。未配置 Key 时抛出可读异常，由页面捕获。"""
+    if not config.is_configured():
+        raise RuntimeError(config.config_hint())
+    return OpenAI(api_key=config.API_KEY, base_url=config.BASE_URL)
 
 def _load_questions() -> list[dict]:
     with open(DATA_DIR / "cs408_questions.json", encoding="utf-8") as f:
@@ -75,8 +82,8 @@ def explain_question(question_text: str, subject: str = "未知") -> str:
 
 要具体、清楚，像一对一辅导，不要套话。"""
 
-    resp = client.chat.completions.create(
-        model=MODEL,
+    resp = _get_client().chat.completions.create(
+        model=config.MODEL,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3,
         max_tokens=1500,

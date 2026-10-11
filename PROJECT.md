@@ -62,16 +62,30 @@
 - 侧边栏可一键清空
 
 ### 模块 ⑥ 考研咨询（pages/📚_考研咨询.py）
-- 院校库：23 所代表性院校（985/211/双非分层）
+- 院校库：137 所代表性院校（985 / 211 / 双非分层，覆盖 31 个省份，含安徽本地 12 所）
+- 字段：院校名 / 层次 / 省份 / 城市 / 学科评估等级 / 难度 1-5 / 参考分数 / 是否接收调剂 / 备注
 - 三档推荐：冲 / 稳 / 保
-- LLM 生成个性化报考建议
-- LLM 生成按月学习计划
+- 筛选维度：地区、层次、难度、只看接收调剂、院校名关键词
+- LLM 生成个性化报考建议 + 按月学习计划
 - 历史推荐记录落 SQLite（core/kaoyan_storage.py）
 
 ### 模块 ⑦ 408 专业课学习（pages/💻_408专业课.py）
-- 四科知识地图：数据结构 / 计组 / OS / 数据库
+- 四科知识地图：数据结构 / 计组 / OS / 数据库（卡片式）
 - 12 道经典例题（带详细解析）
 - AI 讲题：贴题自动按"考点→思路→答案→易错点→举一反三"五段式讲解
+- **错题本**：例题可一键加入、记录错因与笔记、掌握状态标记、各科目掌握率进度条（core/wrongbook.py）
+
+### 模块 ⑧ 统一配置管理（core/config.py）
+- 密钥读取优先级：Streamlit Secrets > 环境变量 > .env > 默认值
+- **禁止硬编码 API Key**；缺失时降级为友好提示而非崩溃
+- 提供 `.env.example` 与 `.streamlit/secrets.toml.example` 模板
+
+### 模块 ⑨ 统一 UI 设计系统（core/theme.py）
+- 两套主题令牌：`WARM` 治愈暖色（聊天页 / 心情周报）、`COOL` 现代 SaaS 冷色（考研 / 408）
+- 集中管理配色、字体层级、圆角体系、阴影规范、组件样式
+- 可复用组件：`hero()` 渐变标题条、`card()` 信息卡、`stat_row()` 指标卡、`empty()` 空状态
+- 全局响应式：768px 以下自动收缩留白与字号
+- **改配色只需动 theme.py 里的令牌字典，不用翻各页面**
 
 ---
 
@@ -89,23 +103,24 @@ emotion-companion/
 │   └── cat_avatar.png             # 知心猫猫头像（AI生成）
 ├── core/
 │   ├── __init__.py
+│   ├── theme.py                     # ⑨ 统一 UI 设计系统（双主题令牌+组件）
+│   ├── config.py                    # ⑧ 统一配置（密钥读取/校验）
 │   ├── chat_engine.py              # 对话主流程（串起②③④⑤）
 │   ├── system_prompt.py             # 小猫娘人设 + 咨询技巧
 │   ├── safety.py                  # ③ 危机检测
 │   ├── emotion_tracker.py         # ② 情绪落库
 │   ├── campus_rag.py               # ④ 校园RAG
 │   ├── memory.py                   # ⑤ 长期记忆
-│   ├── kaoyan_advisor.py           # ⑥ 考研推荐+建议+计划
+│   ├── kaoyan_advisor.py           # ⑥ 考研推荐+筛选+建议+计划
 │   ├── kaoyan_storage.py           # ⑥ 考研记录落库
-│   └── cs408_advisor.py            # ⑦ 408讲题
+│   ├── cs408_advisor.py            # ⑦ 408讲题
+│   └── wrongbook.py                 # ⑦ 408错题本
 ├── data/
-│   ├── campus_faq.json             # 校园话题语料
-│   ├── crisis_keywords.txt         # 危机关键词词典
-│   ├── schools.json                 # 考研院校库（23所）
+│   ├── campus_faq.json             # 校园话题语料（20 类）
+│   ├── crisis_keywords.txt         # 危机关键词词典（65 词）
+│   ├── schools.json                 # 考研院校库（137所，含地区/学科/调剂字段）
 │   ├── cs408_questions.json         # 408经典例题（12道）
-│   ├── mood.db                     # 情绪库（自动生成）
-│   ├── memory.db                   # 对话记忆库（自动生成）
-│   └── kaoyan.db                   # 考研记录库（自动生成）
+│   └── *.db                         # 自动生成的 SQLite 库
 └── pages/
     ├── 📊_心情周报.py
     ├── 📚_考研咨询.py
@@ -116,24 +131,42 @@ emotion-companion/
 
 ## 五、双主题设计（UI 规范）
 
-| 页面 | 色调 | 风格 |
-|---|---|---|
-| 聊天主页 | 暖米白渐变 + 橘色 #FF8C5A | 圆角气泡、柔和阴影、治愈感 |
-| 心情周报 | 跟随全局暖色 | 手账感 |
-| 考研咨询 | 冷灰白 #F5F7FA + 深蓝 #2C5282 | 直角按钮、学术卡片 |
-| 408 专业课 | 冷灰白 + 深蓝 | 左侧蓝边线、严肃笔记风 |
+> 样式统一由 `core/theme.py` 注入，改配色只动那里的令牌字典。
+
+| 页面 | 主题函数 | 色调 | 风格 |
+|---|---|---|---|
+| 聊天主页 | `theme.apply_warm()` | 暖米白渐变 + 橘色 `#FF8C5A` | 圆角气泡、柔和阴影、治愈感 |
+| 心情周报 | `theme.apply_warm()` | 跟随暖色体系 | 手账感、图表配色和谐化 |
+| 考研咨询 | `theme.apply_cool()` | 冷灰白 `#F7F9FC` + 深蓝 `#2C5282` | 卡片式、现代 SaaS |
+| 408 专业课 | `theme.apply_cool()` | 冷灰白 + 深蓝 | 卡片网格、进度条、笔记风 |
+
+通用组件：`hero()` 渐变标题条 / `card()` 信息卡 / `stat_row()` 指标卡 / `empty()` 空状态。
 
 ---
 
 ## 六、配置说明（Secrets）
 
-Streamlit Cloud 已配置以下 Secrets（本地开发也可直接写在 `core/chat_engine.py` 默认值）：
+> ⚠️ **绝对不要**把 API Key 写进源码。密钥按 `Streamlit Secrets > 环境变量 > .env` 优先级读取。
+
+云端请在 Streamlit Cloud 的 App settings → Secrets 中配置：
 
 ```toml
-LLM_API_KEY = "sk-1b253798a2864e188ba3d3794373c3e2"
+LLM_API_KEY = "sk-你的key"
 LLM_BASE_URL = "https://api.deepseek.com"
 LLM_MODEL = "deepseek-chat"
 ```
+
+本地开发复制模板即可：
+
+```bash
+cp .env.example .env
+# 或
+cp .streamlit/secrets.toml.example .streamlit/secrets.toml
+```
+
+Key 申请地址：https://platform.deepseek.com/api_keys
+
+未配置时应用不会崩溃：聊天页会显示配置指引，危机检测模块照常工作。
 
 ---
 
@@ -142,6 +175,9 @@ LLM_MODEL = "deepseek-chat"
 ```bash
 # 安装依赖
 pip install -r requirements.txt
+
+# 配置 Key
+cp .env.example .env   # 然后编辑 .env 填入真实 Key
 
 # 启动
 streamlit run app.py
@@ -163,14 +199,17 @@ streamlit run app.py
 
 ## 九、待改进 / TODO（按优先级）
 
-- [ ] **【高】** 把 `core/safety.py` 里的 `SCHOOL_COUNSELING` 换成淮南师范学院真实心理咨询中心电话、地址、开放时间
-- [ ] **【高】** 扩充 `data/schools.json` 院校库到 50+ 所
-- [ ] **【中】** 扩充 `data/campus_faq.json` 到 15~20 个话题
-- [ ] **【中】** 408 模块加入错题本功能
+- [x] **【高】** ~~把 `core/safety.py` 里的 `SCHOOL_COUNSELING` 换成真实信息~~ → 已改为留空自动降级，只展示真实热线（待你填入本校信息）
+- [x] **【高】** ~~扩充 `data/schools.json` 院校库到 50+ 所~~ → 已扩至 137 所，含地区/学科等级/调剂字段
+- [x] **【中】** ~~扩充 `data/campus_faq.json` 到 15~20 个话题~~ → 已扩至 20 类
+- [x] **【中】** ~~408 模块加入错题本功能~~ → 已完成（core/wrongbook.py）
+- [x] **【高】** ~~移除硬编码 API Key~~ → 已迁至 core/config.py，支持 Secrets/环境变量/.env
+- [x] **【中】** ~~UI 优化~~ → 已完成，四个页面统一设计系统（core/theme.py）
+- [ ] **【高】** 去 DeepSeek 后台吊销旧的已泄露 Key（`sk-1b25...c3e2`）
 - [ ] **【中】** 用户注册/登录（当前匿名）
 - [ ] **【低】** 语音输入输出
 - [ ] **【低】** 接入向量数据库（Chroma）替代关键词 RAG
-- [ ] **【低】** 移动端适配优化
+- [ ] **【低】** 移动端适配优化（已做基础响应式，可进一步打磨）
 
 ---
 
@@ -200,6 +239,6 @@ streamlit run app.py
 2. **不要删危机检测模块**：这是社会价值核心，任何改动必须保留 safety.py 最高优先级
 3. **新功能请新建文件**：不要污染现有模块，按 `core/xxx.py` + `pages/xxx.py` 模式扩展
 4. **数据库改动向后兼容**：新增字段用 ALTER TABLE，不要重建表
-5. **Secrets 不要硬编码进 git**：必须走 Streamlit Secrets / 环境变量
+5. **Secrets 不要硬编码进 git**：必须走 core/config.py 的统一入口（Secrets / 环境变量 / .env）
 6. **提交前跑语法检查**：`python -m py_compile <改动文件>`
 7. **UI 保持双主题**：聊天类暖色、学习类冷色

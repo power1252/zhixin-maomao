@@ -12,8 +12,8 @@ data/*.db
 venv/
 .env
 
-# Streamlit
-.streamlit/
+# Streamlit 密钥（务必不要提交！）
+.streamlit/secrets.toml
 
 # OS
 .DS_Store
