@@ -63,6 +63,38 @@ _COOL = {
     "font": '"PingFang SC", "Microsoft YaHei", -apple-system, sans-serif',
 }
 
+# 像素风（8-bit / NES 风格，参考 NES.css、8bitcn/ui 的设计语言：
+# 0 圆角、硬阴影、有限调色板、Press Start 2P 像素字体）
+_PIXEL = {
+    "name": "pixel",
+    # 背景：深蓝底 + 网格
+    "bg": "#1a1c2c",
+    "surface": "#29366f",
+    "surface_alt": "#1f2547",
+    "sidebar": "#14172b",
+    # 主色：橙(按钮) + 黄(高亮/数字)
+    "primary": "#ffcd75",
+    "primary_dark": "#ef7d57",
+    "primary_soft": "#333c57",
+    "primary_grad": "#ef7d57",
+    # 文本
+    "text": "#f4f4f4",
+    "text_sub": "#94b0c2",
+    # 描边（近黑）/ 硬阴影
+    "border": "#0d0e1a",
+    "shadow": "4px 4px 0 #0d0e1a",
+    "shadow_hover": "6px 6px 0 #0d0e1a",
+    "radius": "0px",
+    "radius_sm": "0px",
+    "font": '"Press Start 2P", "ZCOOL KuaiLe", "PingFang SC", "Microsoft YaHei", monospace',
+    # 像素风专用色
+    "panel": "#29366f",
+    "panel_alt": "#333c57",
+    "ok": "#38b764",
+    "bad": "#b13e53",
+    "warn": "#ffcd75",
+}
+
 # 情绪 → 配色（和谐化的分类色板，两套主题共用）
 EMOTION_COLORS = {
     "joy": "#F5A623",
@@ -350,9 +382,227 @@ def apply_cool():
     st.markdown(_css(_COOL), unsafe_allow_html=True)
 
 
+def _pixel_css(t: dict) -> str:
+    """像素风（8-bit / NES 风格）CSS。
+
+    设计语言参考 GitHub 开源项目 NES.css / 8bitcn-ui：
+    0 圆角、硬阴影(offset shadow)、有限复古调色板、Press Start 2P 像素字体、
+    image-rendering:pixelated 保证位图素材锐利。
+    """
+    return f"""
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=ZCOOL+KuaiLe&display=swap');
+
+    .stApp {{
+        background-color: {t["bg"]};
+        background-image:
+            linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+        background-size: 16px 16px;
+        font-family: "ZCOOL KuaiLe", "PingFang SC", "Microsoft YaHei", sans-serif;
+        color: {t["text"]};
+    }}
+    .block-container {{ padding-top: 2rem; padding-bottom: 3rem; max-width: 1080px; }}
+
+    h1, h2, h3, h4 {{
+        font-family: {t["font"]};
+        color: {t["primary"]};
+        letter-spacing: 0;
+        text-shadow: 2px 2px 0 {t["border"]};
+    }}
+    h1 {{ font-weight: 400; }}
+    h2 {{ font-size: 1.05rem; }}
+    h3 {{ font-size: 0.92rem; }}
+    p, li, span, div {{ color: {t["text"]}; }}
+
+    img {{ image-rendering: pixelated; }}
+
+    section[data-testid="stSidebar"] {{
+        background: {t["sidebar"]};
+        border-right: 4px solid {t["border"]};
+    }}
+
+    /* 像素方按钮 + 硬阴影 + 按下位移 */
+    .stButton > button, .stFormSubmitButton > button, .stDownloadButton > button {{
+        background: {t["primary_dark"]};
+        color: #ffffff;
+        border: 3px solid {t["border"]};
+        border-radius: 0;
+        padding: 0.55rem 1rem;
+        font-family: {t["font"]};
+        font-weight: 400;
+        font-size: 0.78rem;
+        box-shadow: {t["shadow"]};
+        transition: none;
+    }}
+    .stButton > button p, .stFormSubmitButton > button p, .stDownloadButton > button p {{
+        font-family: {t["font"]};
+        color: #ffffff;
+    }}
+    .stButton > button:hover, .stFormSubmitButton > button:hover, .stDownloadButton > button:hover {{
+        background: {t["primary"]};
+        color: {t["border"]};
+        box-shadow: {t["shadow_hover"]};
+        transform: translate(-2px,-2px);
+    }}
+    .stButton > button:hover p {{ color: {t["border"]}; }}
+    .stButton > button:active {{ transform: translate(2px,2px); box-shadow: 0 0 0 {t["border"]}; }}
+
+    /* 输入控件 */
+    .stTextInput input, .stTextArea textarea, .stNumberInput input,
+    .stSelectbox div[data-baseweb="select"] > div {{
+        border-radius: 0 !important;
+        border: 3px solid {t["border"]} !important;
+        background: {t["surface"]} !important;
+        color: {t["text"]} !important;
+        font-family: {t["font"]};
+        box-shadow: {t["shadow"]};
+    }}
+    .stTextInput input:focus, .stTextArea textarea:focus {{ border-color: {t["primary"]} !important; }}
+
+    /* 展开器 */
+    .stExpander {{
+        border: 3px solid {t["border"]} !important;
+        border-radius: 0 !important;
+        background: {t["surface"]} !important;
+        box-shadow: {t["shadow"]};
+        overflow: hidden;
+    }}
+    .stExpander summary {{ font-family: {t["font"]}; color: {t["text"]}; }}
+
+    /* metric */
+    div[data-testid="stMetric"] {{
+        background: {t["surface"]};
+        border: 3px solid {t["border"]};
+        border-radius: 0;
+        box-shadow: {t["shadow"]};
+        padding: 14px 16px;
+    }}
+    div[data-testid="stMetricValue"] {{ color: {t["primary"]}; font-family: {t["font"]}; }}
+    div[data-testid="stMetricLabel"] {{ color: {t["text_sub"]}; }}
+
+    /* tabs */
+    .stTabs [data-baseweb="tab-list"] {{ gap: 6px; border-bottom: 3px solid {t["border"]}; }}
+    .stTabs [data-baseweb="tab"] {{
+        border-radius: 0; padding: 8px 14px;
+        font-family: {t["font"]}; font-size: 0.76rem;
+        color: {t["text_sub"]}; background: {t["panel_alt"]};
+        border: 3px solid {t["border"]}; border-bottom: none;
+    }}
+    .stTabs [aria-selected="true"] {{ color: {t["border"]} !important; background: {t["primary"]}; }}
+
+    /* 进度条 */
+    .stProgress > div > div > div {{ background: {t["panel_alt"]}; border-radius: 0; border: 2px solid {t["border"]}; }}
+    .stProgress > div > div > div > div {{ background: {t["primary"]}; border-radius: 0; }}
+
+    /* 提示条 */
+    div[data-testid="stAlert"] {{ border-radius: 0; border: 3px solid {t["border"]}; box-shadow: {t["shadow"]}; }}
+    hr {{ border-color: {t["border"]}; }}
+
+    /* ---------- 自定义组件（像素版） ---------- */
+    .zb-hero {{
+        background: {t["panel"]};
+        border: 4px solid {t["border"]};
+        border-radius: 0;
+        padding: 22px 26px;
+        margin-bottom: 20px;
+        box-shadow: {t["shadow_hover"]};
+    }}
+    .zb-hero-title {{
+        color: {t["primary"]} !important;
+        font-family: {t["font"]};
+        font-size: 1.45rem;
+        font-weight: 400;
+        margin: 0;
+        text-shadow: 3px 3px 0 {t["border"]};
+        line-height: 1.5;
+    }}
+    .zb-hero-sub {{ color: {t["text"]} !important; font-size: 0.9rem; margin: 12px 0 0 0; }}
+    .zb-card {{
+        background: {t["surface"]};
+        border: 3px solid {t["border"]};
+        border-radius: 0;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+        box-shadow: {t["shadow"]};
+        transition: none;
+    }}
+    .zb-card:hover {{ box-shadow: {t["shadow_hover"]}; transform: translate(-2px,-2px); }}
+    .zb-card-title {{
+        font-family: {t["font"]};
+        font-weight: 400;
+        font-size: 0.82rem;
+        color: {t["primary"]};
+        margin-bottom: 6px;
+        line-height: 1.7;
+    }}
+    .zb-card-body {{ font-size: 0.88rem; color: {t["text"]}; line-height: 1.7; }}
+    .zb-tag {{
+        display: inline-block; padding: 3px 9px; border-radius: 0;
+        font-size: 0.72rem; font-weight: 400;
+        background: {t["primary"]}; color: {t["border"]};
+        border: 2px solid {t["border"]}; margin-right: 6px; margin-top: 2px;
+    }}
+    .zb-tag-warn {{ background: {t["warn"]}; color: {t["border"]}; }}
+    .zb-tag-ok {{ background: {t["ok"]}; color: #ffffff; }}
+    .zb-tag-gray {{ background: {t["panel_alt"]}; color: {t["text_sub"]}; }}
+
+    .zb-stat {{
+        text-align: center; background: {t["panel"]};
+        border: 3px solid {t["border"]}; border-radius: 0;
+        padding: 14px 8px; box-shadow: {t["shadow"]};
+    }}
+    .zb-stat-num {{
+        font-family: {t["font"]}; font-size: 1.25rem;
+        color: {t["primary"]}; line-height: 1.4;
+        text-shadow: 2px 2px 0 {t["border"]};
+    }}
+    .zb-stat-label {{ font-size: 0.78rem; color: {t["text_sub"]}; margin-top: 6px; }}
+
+    .zb-empty {{
+        text-align: center; padding: 38px 20px; color: {t["text_sub"]};
+        background: {t["surface_alt"]}; border: 3px dashed {t["text_sub"]};
+        border-radius: 0; font-size: 0.9rem;
+    }}
+
+    /* 像素关卡卡（页面内联使用） */
+    .px-tile {{
+        background: {t["panel"]}; border: 3px solid {t["border"]};
+        box-shadow: {t["shadow"]}; padding: 14px 10px; text-align: center; height: 100%;
+    }}
+    .px-tile.locked {{ background: {t["surface_alt"]}; }}
+    .px-opt {{
+        border: 3px solid {t["border"]}; border-radius: 0;
+        padding: 11px 14px; margin-bottom: 9px; font-size: 0.9rem;
+        box-shadow: 3px 3px 0 {t["border"]};
+    }}
+    .px-bar {{
+        height: 16px; background: {t["panel_alt"]};
+        border: 3px solid {t["border"]}; overflow: hidden;
+    }}
+    .px-bar > div {{ height: 100%; background: {t["primary"]}; }}
+
+    @media (max-width: 768px) {{
+        .block-container {{ padding-left: 1rem; padding-right: 1rem; }}
+        .zb-hero {{ padding: 16px 18px; }}
+        .zb-hero-title {{ font-size: 1rem; }}
+    }}
+</style>
+"""
+
+
+def apply_pixel():
+    """注入像素风（8-bit）主题——用于 408 闯关小游戏。"""
+    st.markdown(_pixel_css(_PIXEL), unsafe_allow_html=True)
+
+
 def palette(name: str = "warm") -> dict:
     """取出主题令牌，供 Plotly 等外部渲染使用。"""
-    return _WARM if name == "warm" else _COOL
+    if name == "warm":
+        return _WARM
+    if name == "pixel":
+        return _PIXEL
+    return _COOL
 
 
 # ============================================================

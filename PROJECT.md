@@ -81,7 +81,7 @@
 - 提供 `.env.example` 与 `.streamlit/secrets.toml.example` 模板
 
 ### 模块 ⑨ 统一 UI 设计系统（core/theme.py）
-- 两套主题令牌：`WARM` 治愈暖色（聊天页 / 心情周报）、`COOL` 现代 SaaS 冷色（考研 / 408）
+- 三套主题令牌：`WARM` 治愈暖色（聊天页 / 心情周报）、`COOL` 现代 SaaS 冷色（考研 / 408）、`PIXEL` 像素风（408 闯关）
 - 集中管理配色、字体层级、圆角体系、阴影规范、组件样式
 - 可复用组件：`hero()` 渐变标题条、`card()` 信息卡、`stat_row()` 指标卡、`empty()` 空状态
 - 全局响应式：768px 以下自动收缩留白与字号
@@ -93,6 +93,9 @@
 - 答错可一键「加入错题本」，与「💻 408专业课」错题本打通
 - 进度可视化：四科雷达图（闯关正确率 vs 错题掌握率）+ 各科双维柱状图 + 综合掌握度进度条
 - 进度落 SQLite（core/game_progress.py，独立库 game_progress.db，向后兼容）
+- **像素风界面**：8-bit 风格（0 圆角 + 硬阴影 offset-shadow + `Press Start 2P` 像素字体 + `image-rendering:pixelated`）
+- 界面/角色设计参考 GitHub 开源项目：**NES.css**（nostalgic-css）、**8bitcn-ui**、**Pxlkit**、**pixelcat**；
+  猫吉祥物与四科图标等缺失素材由 AI 以像素风生成，存于 `assets/pixel_*.png`
 
 ---
 
@@ -107,7 +110,13 @@ emotion-companion/
 ├── .streamlit/
 │   └── config.toml                 # 全局主题配置
 ├── assets/
-│   └── cat_avatar.png             # 知心猫猫头像（AI生成）
+│   ├── cat_avatar.png             # 知心猫猫头像（AI生成）
+│   ├── pixel_cat.png              # ⑩ 像素风猫吉祥物（AI生成）
+│   ├── pixel_star.png             # ⑩ 像素风星星（AI生成）
+│   ├── pixel_subject_ds.png       # ⑩ 数据结构图标（AI生成）
+│   ├── pixel_subject_co.png       # ⑩ 计组图标（AI生成）
+│   ├── pixel_subject_os.png       # ⑩ 操作系统图标（AI生成）
+│   └── pixel_subject_db.png       # ⑩ 数据库图标（AI生成）
 ├── core/
 │   ├── __init__.py
 │   ├── theme.py                     # ⑨ 统一 UI 设计系统（双主题令牌+组件）
@@ -139,7 +148,7 @@ emotion-companion/
 
 ---
 
-## 五、双主题设计（UI 规范）
+## 五、主题设计（UI 规范）
 
 > 样式统一由 `core/theme.py` 注入，改配色只动那里的令牌字典。
 
@@ -149,7 +158,7 @@ emotion-companion/
 | 心情周报 | `theme.apply_warm()` | 跟随暖色体系 | 手账感、图表配色和谐化 |
 | 考研咨询 | `theme.apply_cool()` | 冷灰白 `#F7F9FC` + 深蓝 `#2C5282` | 卡片式、现代 SaaS |
 | 408 专业课 | `theme.apply_cool()` | 冷灰白 + 深蓝 | 卡片网格、进度条、笔记风 |
-| 408 闯关 | `theme.apply_cool()` | 冷灰白 + 深蓝 | 关卡地图、雷达图、游戏化 |
+| 408 闯关 | `theme.apply_pixel()` | 深蓝底 + 橙黄 8-bit 调色板 | 像素风：硬阴影、方块按钮、像素吉祥物/图标 |
 
 通用组件：`hero()` 渐变标题条 / `card()` 信息卡 / `stat_row()` 指标卡 / `empty()` 空状态。
 
