@@ -26,6 +26,14 @@ def _load_questions() -> list[dict]:
 
 QUESTIONS = _load_questions()
 
+
+def _load_quiz() -> list[dict]:
+    """选择题闯关题库（data/cs408_quiz.json）。"""
+    with open(DATA_DIR / "cs408_quiz.json", encoding="utf-8") as f:
+        return json.load(f)
+
+QUIZ = _load_quiz()
+
 SUBJECTS = ["数据结构", "计算机组成原理", "操作系统", "数据库"]
 
 # 四科知识框架（用于快速回顾）

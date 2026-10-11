@@ -87,6 +87,13 @@
 - 全局响应式：768px 以下自动收缩留白与字号
 - **改配色只需动 theme.py 里的令牌字典，不用翻各页面**
 
+### 模块 ⑩ 408 闯关小游戏（pages/🎮_408闯关.py）
+- 关卡地图：四科各一关（数据结构 / 计组 / OS / 数据库），逐关解锁，通关得 1~3 星
+- 选择题闯关：每关 4 道四选一（data/cs408_quiz.json，共 16 题），选项洗牌、即时反馈
+- 答错可一键「加入错题本」，与「💻 408专业课」错题本打通
+- 进度可视化：四科雷达图（闯关正确率 vs 错题掌握率）+ 各科双维柱状图 + 综合掌握度进度条
+- 进度落 SQLite（core/game_progress.py，独立库 game_progress.db，向后兼容）
+
 ---
 
 ## 四、代码结构
@@ -113,18 +120,21 @@ emotion-companion/
 │   ├── memory.py                   # ⑤ 长期记忆
 │   ├── kaoyan_advisor.py           # ⑥ 考研推荐+筛选+建议+计划
 │   ├── kaoyan_storage.py           # ⑥ 考研记录落库
-│   ├── cs408_advisor.py            # ⑦ 408讲题
-│   └── wrongbook.py                 # ⑦ 408错题本
+│   ├── cs408_advisor.py            # ⑦ 408讲题 + 题库加载
+│   ├── wrongbook.py                 # ⑦ 408错题本
+│   └── game_progress.py            # ⑩ 闯关进度存储
 ├── data/
 │   ├── campus_faq.json             # 校园话题语料（20 类）
 │   ├── crisis_keywords.txt         # 危机关键词词典（65 词）
 │   ├── schools.json                 # 考研院校库（137所，含地区/学科/调剂字段）
 │   ├── cs408_questions.json         # 408经典例题（12道）
+│   ├── cs408_quiz.json             # ⑩ 408闯关选择题（16道）
 │   └── *.db                         # 自动生成的 SQLite 库
 └── pages/
     ├── 📊_心情周报.py
     ├── 📚_考研咨询.py
-    └── 💻_408专业课.py
+    ├── 💻_408专业课.py
+    └── 🎮_408闯关.py
 ```
 
 ---
@@ -139,6 +149,7 @@ emotion-companion/
 | 心情周报 | `theme.apply_warm()` | 跟随暖色体系 | 手账感、图表配色和谐化 |
 | 考研咨询 | `theme.apply_cool()` | 冷灰白 `#F7F9FC` + 深蓝 `#2C5282` | 卡片式、现代 SaaS |
 | 408 专业课 | `theme.apply_cool()` | 冷灰白 + 深蓝 | 卡片网格、进度条、笔记风 |
+| 408 闯关 | `theme.apply_cool()` | 冷灰白 + 深蓝 | 关卡地图、雷达图、游戏化 |
 
 通用组件：`hero()` 渐变标题条 / `card()` 信息卡 / `stat_row()` 指标卡 / `empty()` 空状态。
 
