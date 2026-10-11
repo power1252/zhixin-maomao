@@ -21,9 +21,24 @@ import streamlit as st
 from core import cs408_advisor, game_progress, theme, wrongbook
 
 st.set_page_config(page_title="408闯关", page_icon="🎮", layout="wide")
-theme.apply_pixel()
-
-PAL = theme.palette("pixel")
+# 防御性兜底：Streamlit Cloud 重新部署时偶尔会残留旧模块的 sys.modules 缓存，
+# 旧 theme 没有 apply_pixel()/像素调色板，直接调用会触发整页 AttributeError。
+# 用 hasattr 兜底，缺失时降级为冷色主题并补齐像素专用键，保证页面永不崩溃。
+if hasattr(theme, "apply_pixel"):
+    theme.apply_pixel()
+    PAL = theme.palette("pixel")
+else:
+    theme.apply_cool()
+    PAL = dict(theme.palette("cool"))
+    PAL.setdefault("panel", PAL["surface_alt"])
+    PAL.setdefault("panel_alt", PAL["surface_alt"])
+    PAL.setdefault("ok", "#38b764")
+    PAL.setdefault("bad", "#b13e53")
+    PAL.setdefault("warn", "#ffcd75")
+    st.warning(
+        "⚠️ 像素主题组件未就绪（疑似旧版本模块缓存），已临时用冷色主题兜底。"
+        "请到 Streamlit Cloud 重启应用以恢复完整像素风格。"
+    )
 SUBJECTS = cs408_advisor.SUBJECTS
 ASSETS = Path(__file__).parent.parent / "assets"
 CAT_IMG = ASSETS / "pixel_cat.png"
